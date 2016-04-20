@@ -4,6 +4,7 @@ their awesome lentils in the menu.
 """
 
 import re
+import pickle
 import logging
 from datetime import date
 
@@ -57,7 +58,7 @@ def lentils_command(bot, update):
     keyword = 'lentejas'
     logging.info("/lentils command received from {}".format(
         update.message.from_user.username))
-    menu = get_menu()
+    menu = read_menu()
 
     there_are_lentils, dish = lentils(menu, keyword=keyword)
 
@@ -75,7 +76,7 @@ def lentils_command(bot, update):
 def menu_command(bot, update):
     logging.info("/menu command received from {}".format(
         update.message.from_user.username))
-    menu = get_menu()
+    menu = read_menu()
     msg = "Hoy es {}\n*Primer plato*\n".format(
         date.today().strftime('%Y-%m-%d'))
 
@@ -109,12 +110,35 @@ enseñarte el /menu
         logging.error("Error sending response to /start", exec_info=True)
 
 
+def update_menu(bot):
+    logging.info("Updating menu")
+    menu = get_menu()
+    output = open('menu.pkl', 'wb')
+    pickle.dump(menu, output)
+    output.close()
+    return menu
+
+
+def read_menu():
+    try:
+        pkl_file = open('menu.pkl', 'rb')
+        menu = pickle.load(pkl_file)
+    except:
+        logging.warning("Couldn't read menu")
+        menu = update_menu()
+    return menu
+
+
 def init(token):
     # Init the bot
     # bot = telegram.Bot(token=token)
+    logging.info("Starting bot")
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
+    update_menu(None)
 
+    job_queue = updater.job_queue
+    job_queue.put(update_menu, 60 * 60)
     dispatcher.addTelegramCommandHandler('lentejas', lentils_command)
     dispatcher.addTelegramCommandHandler('menu', menu_command)
     dispatcher.addTelegramCommandHandler('start', start_command)
