@@ -110,6 +110,17 @@ enseñarte el /menu
         logging.error("Error sending response to /start", exec_info=True)
 
 
+def easter_command(bot, update):
+    logging.info("/easter command received from {}".format(
+        update.message.from_user.username))
+    try:
+        bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text="Drink joylent")
+    except:
+        logging.error("Error sending response to /start", exec_info=True)
+
+
 def update_menu(bot):
     logging.info("Updating menu")
     menu = get_menu()
@@ -143,6 +154,7 @@ def init(token):
     dispatcher.addTelegramCommandHandler('menu', menu_command)
     dispatcher.addTelegramCommandHandler('start', start_command)
     dispatcher.addTelegramCommandHandler('help', start_command)
+    dispatcher.addTelegramCommandHandler('easter', easter_command)
     updater.start_polling()
 
 init(TOKEN)
