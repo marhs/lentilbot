@@ -14,9 +14,15 @@ from lxml import html
 
 import settings
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 TOKEN = settings.token
+logging.basicConfig(
+    format='%(asctime)s %(message)s',
+    datefmt='%Y/%m/%d %I:%M:%S %p',
+    filename='basic.log',
+    level=logging.INFO,
+)
+
+logging.basicConfig(filename='basic.log', level=logging.DEBUG)
 
 
 def get_dish_data(dishes):
@@ -49,7 +55,8 @@ def lentils(menu, keyword='ternera'):
 
 def lentils_command(bot, update):
     keyword = 'lentejas'
-    logger.info("Lentils msg received")
+    logging.info("/lentils command received from {}".format(
+        update.message.from_user.username))
     menu = get_menu()
 
     there_are_lentils, dish = lentils(menu, keyword=keyword)
@@ -62,11 +69,12 @@ def lentils_command(bot, update):
     try:
         bot.sendMessage(chat_id=update.message.chat_id, text=msg)
     except:
-        logger.error("Error sending response to /lentils", exec_info=True)
+        logging.error("Error sending response to /lentils", exec_info=True)
 
 
 def menu_command(bot, update):
-    logger.info("Lentils msg received")
+    logging.info("/menu command received from {}".format(
+        update.message.from_user.username))
     menu = get_menu()
     msg = "Hoy es {}\n*Primer plato*\n".format(
         date.today().strftime('%Y-%m-%d'))
@@ -82,7 +90,7 @@ def menu_command(bot, update):
                         text=msg,
                         parse_mode=telegram.ParseMode.MARKDOWN)
     except:
-        logger.error("Error sending response to /menu", exec_info=True)
+        logging.error("Error sending response to /menu", exec_info=True)
 
 
 def start_command(bot, update):
@@ -91,12 +99,14 @@ def start_command(bot, update):
 del James Joyce. Puedo comprobar si hay /lentejas o
 enseñarte el /menu
     """
+    logging.info("/start - /help command received from {}".format(
+        update.message.from_user.username))
     try:
         bot.sendMessage(
             chat_id=update.message.chat_id,
             text=msg)
     except:
-        logger.error("Error sending response to /start", exec_info=True)
+        logging.error("Error sending response to /start", exec_info=True)
 
 
 def init(token):
